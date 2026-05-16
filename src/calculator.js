@@ -23,28 +23,53 @@ function divide(a, b) {
   return a / b;
 }
 
-module.exports = { add, subtract, multiply, divide };
+// Modulo: returns the remainder of a divided by b (handles division by zero)
+function modulo(a, b) {
+  if (b === 0) {
+    throw new Error("Division by zero is not allowed");
+  }
+  return a % b;
+}
+
+// Exponentiation: returns base raised to the power of exponent
+function power(base, exponent) {
+  return base ** exponent;
+}
+
+// Square root: returns the square root of n (handles negative numbers)
+function squareRoot(n) {
+  if (n < 0) {
+    throw new Error("Square root of a negative number is not allowed");
+  }
+  return Math.sqrt(n);
+}
+
+module.exports = { add, subtract, multiply, divide, modulo, power, squareRoot };
 
 // CLI entry point
 if (require.main === module) {
   const [, , operation, a, b] = process.argv;
   const numA = parseFloat(a);
-  const numB = parseFloat(b);
+  const numB = b !== undefined ? parseFloat(b) : undefined;
 
-  if (!operation || isNaN(numA) || isNaN(numB)) {
-    console.log("Usage: node calculator.js <add|subtract|multiply|divide> <a> <b>");
+  const singleArgOps = ["squareRoot"];
+  const needsTwoArgs = !singleArgOps.includes(operation);
+
+  if (!operation || isNaN(numA) || (needsTwoArgs && isNaN(numB))) {
+    console.log("Usage: node calculator.js <add|subtract|multiply|divide|modulo|power> <a> <b>");
+    console.log("       node calculator.js squareRoot <n>");
     process.exit(1);
   }
 
-  const ops = { add, subtract, multiply, divide };
+  const ops = { add, subtract, multiply, divide, modulo, power, squareRoot };
 
   if (!ops[operation]) {
-    console.error(`Unknown operation: ${operation}. Use add, subtract, multiply, or divide.`);
+    console.error(`Unknown operation: ${operation}. Use add, subtract, multiply, divide, modulo, power, or squareRoot.`);
     process.exit(1);
   }
 
   try {
-    const result = ops[operation](numA, numB);
+    const result = needsTwoArgs ? ops[operation](numA, numB) : ops[operation](numA);
     console.log(`Result: ${result}`);
   } catch (err) {
     console.error(`Error: ${err.message}`);
